@@ -24,7 +24,7 @@ io.on('received message', function(data) {
 });
 
 io.on('connection', function(socket) {
-    io.emit('new connection', socket);
+    socket.emit('new connection', socket);
     socket.on('message', function(data) {
         io.emit('received message', data);
     });
