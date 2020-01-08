@@ -19,11 +19,17 @@ app.get('/', (req, res, next) => {
     res.send(messages);
 });
 
+let socketPool = [];
+
 io.on('received message', function(data) {
     messages.push(data);
+    socketPool.forEach(socket => {
+        socket.emit('received message', data);
+    });
 });
 
 io.on('connection', function(socket) {
+    socketPool.push(socket);
     socket.emit('new connection', socket);
     socket.on('message', function(data) {
         io.emit('received message', data);
