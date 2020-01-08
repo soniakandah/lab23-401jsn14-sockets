@@ -8,21 +8,24 @@ const io = socket(server);
 
 // Routes
 
+let messages = [];
+
 var port = process.env.PORT || 5000; // Use the port that Heroku provides or default to 5000
 app.listen(port, function() {
     console.log('Express server listening');
 });
 
 app.get('/', (req, res, next) => {
-    res.send('Homepage');
+    res.send(messages);
 });
 
-var status = 'All is well.';
+io.on('received message', function(data) {
+    messages.push(data);
+});
 
 io.on('connection', function(socket) {
-    io.emit('status', { status: status }); // note the use of io.sockets to emit but socket.on to listen
-    socket.on('reset', function(data) {
-        status = 'War is imminent!';
-        io.emit('status', { status: status });
+    io.emit('new connection', socket);
+    socket.on('message', function(data) {
+        io.emit('received message', data);
     });
 });
